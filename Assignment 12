@@ -1,0 +1,189 @@
+"""
+@Project: Maman12
+
+@Description: This Python solution implements several functions as part of the Maman 12 problem set.
+    The functions include:
+    - Finding the largest sum between zeros in a list
+    - Shifting a list
+    - Checking if a list is 'perfect'
+    - Verifying whether a matrix is a mirrored palindrome
+
+@Author: Maya_Katan
+@semester: 2025a
+"""
+class MMN12:
+    """
+    This class contains various functions to solve problems presented in the Maman 12 assignment.
+    Each function solves a specific problem based on the given input.
+
+    Functions:
+        biggest_sum (lst): Finds the largest sum between two 0's in a list.
+        biggest_sum_row (mat): Finds the row with the highest sum in a matrix.
+        shift_k_right (lst, k): Shifts the elements of a list by k positions to the right.
+        shift_right_size (a, b): Finds the number of shifts required to make list "a" equal to list "b".
+        is_perfect (lst): Checks if the list forms a "perfect" sequence with no cycles.
+        mirror_list (mat): Checks if a matrix is a mirrored palindrome.
+    """
+#Question number 1
+def biggest_sum (lst):
+    """
+    Find the largest sum between two 0's in a list of natural numbers.
+    Args:
+        lst (list of int): A list of natural numbers.
+    Returns:
+        int: The largest sum between two 0's in the list, or 0 if less than two 0's are found.
+    Raises:
+        TypeError: If any element in the list is not a natural number.
+    """
+    # Checking if each element in the list is a natural number
+    for num in lst:
+        if not isinstance(num, int) or num < 0:
+            raise TypeError ("Non-natural value")
+
+    # Finding the positions of all 0's in the list
+    zero_positions = [i for i, num in enumerate(lst) if num == 0]
+
+    # If there are less than two 0's in the list, return 0
+    if len(zero_positions) < 2:
+        return 0
+
+    # Calculating the highest sum between two 0's
+    max_sum = 0
+    for i in range(len(zero_positions) - 1):
+        sum_between_zeros = sum(lst[zero_positions[i] + 1:zero_positions[i + 1]])
+        max_sum = max(max_sum, sum_between_zeros)
+    return max_sum
+
+def biggest_sum_row(mat):
+    """
+    Find the row with the highest sum in a matrix.
+    Args:
+        mat (list[list[int]]): A matrix represented by a list of lists.
+    Returns:
+        int: The index of the row with the highest sum, or -1 if an error occurs.
+    Raises:
+        TypeError: If the input matrix is not a valid list of lists.
+    """
+    try:
+        max_sum = -1
+        max_row_index = -1
+
+        for i, row in enumerate(mat):
+            row_sum = biggest_sum(row)
+            if row_sum > max_sum:
+                max_sum = row_sum
+                max_row_index = i
+        return max_row_index
+    except TypeError:
+        return -1
+
+
+
+#Question number 2
+def shift_k_right(lst, k):
+    """
+    Shift the elements of the list by k positions to the right.
+    Args:
+        lst (list): A list of elements to shift.
+        k (int): The number of positions to shift the list by.
+    Returns:
+        list: The list after being shifted k positions to the right.
+    Raises:
+        IndexError: If k is negative or out of range.
+    """
+    # Raise an error if k is negative or out of range
+    if k < 0 or k >=  len(lst):
+        raise IndexError("Invalid value of k")
+    return lst[-k:] + lst[:-k] # Combine last k elements with the rest
+
+def shift_right_size(a,b):
+    """
+    Find the number of shifts required to make list "a" equal to list "b".
+    Args:
+        a (list): The first list to compare.
+        b (list): The second list to compare.
+    Returns:
+        int or None: The number of shifts needed, or None if no shift matches.
+    """
+    if len(a) != len(b): # If the lists have different lengths
+        return None
+
+    if len(a) == 0: # Special case for empty lists
+        return 0
+
+    for k in range (len(a)):  # Iterate through all possible shifts (0 to len(a)-1)
+        if b[-k:] + b[:-k] == a:
+            return k
+    return None   # If no shift matches, return None
+
+
+
+#Question number 3
+def is_perfect(lst):
+    """
+    Check if the list forms a "perfect" sequence with no cycles.
+    Args:
+        lst (list of int): A list of indices representing the next position to visit.
+    Returns:
+        bool: True if the list is perfect (ends in a cycle-free sequence), False otherwise.
+    Raises:
+        IndexError: If the list contains invalid indices or cycles.
+    """
+    if not lst:  # If the list is empty, return True
+        return True
+
+    visited = [False] * len(lst)  # To track visited indices
+    current_index = 0
+
+    while True:
+        if visited[current_index]:  # If we revisit an index, it's a cycle
+            return False  # Return False when a cycle is detected
+
+        visited[current_index] = True  # Mark the current index as visited
+        next_index = lst[current_index]  # Get the value at the current index
+
+        if next_index == 0:  # If the value is 0, the scan ends
+            # Ensure all elements have been visited and the last value is 0
+            return all(visited)
+
+        if next_index >= len(lst) or next_index < 0:  # If the next index is out of bounds
+            raise IndexError("Index out of range")
+
+        current_index = next_index  # Move to the next index as per the value
+
+
+
+#Question number 4
+def mirror_list(mat):
+    """
+    Check if a matrix is a mirrored list.
+    Args:
+        mat (2D list of strings): A matrix of strings where each string is of length 1.
+
+    Returns:
+        bool: True if the matrix is a mirrored list, False otherwise.
+
+    Raises:
+        TypeError: If an element in the matrix is not of type string.
+        ValueError: If any string in the matrix is not of length 1.
+    """
+    if not mat:  # If the list is empty, return True
+        return True
+
+    for row in mat:
+        for item in row:
+            if not isinstance(item, str):  # Check if the item is not a string
+                raise TypeError("Each element must be a string")
+            if len(item) != 1:  # Check if the string length is not 1
+                raise ValueError("Each string must be of length 1")
+
+    # Check if the matrix is mirrored
+    rows = len(mat)
+    cols = len(mat[0])
+
+    for i in range(rows):
+        for j in range(cols):
+            if mat[i][j] != mat[rows - i - 1][j]:  # Compare the current element with its mirrored counterpart
+                return False
+
+    return True
